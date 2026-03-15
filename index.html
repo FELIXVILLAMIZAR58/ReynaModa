@@ -1584,25 +1584,19 @@ body.light-mode .hero-sub{color:#888}
 .sr-highlight{color:var(--gold)}
 .search-kbd{font-size:9px;color:var(--muted);position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.06);border:.5px solid var(--border);border-radius:5px;padding:2px 7px;letter-spacing:.08em;pointer-events:none}
 
-/* ══ CAMBIO DE COLOR DE PRENDA CSS ══════════════════════════════════ */
-.color-variant-wrap{position:relative}
-.color-variant-img{transition:filter .35s ease}
-/* Filtros CSS por color */
-.cv-negro    {filter:none}
-.cv-blanco   {filter:invert(1) brightness(1.2)}
-.cv-rojo     {filter:sepia(1) saturate(5) hue-rotate(320deg) brightness(.9)}
-.cv-azul     {filter:sepia(1) saturate(4) hue-rotate(190deg) brightness(.85)}
-.cv-verde    {filter:sepia(1) saturate(4) hue-rotate(90deg) brightness(.85)}
-.cv-amarillo {filter:sepia(1) saturate(5) hue-rotate(10deg) brightness(1.1)}
-.cv-rosa     {filter:sepia(1) saturate(4) hue-rotate(290deg) brightness(.95)}
-.cv-fucsia   {filter:sepia(1) saturate(6) hue-rotate(280deg) brightness(.9)}
-.cv-dorado   {filter:sepia(1) saturate(3) hue-rotate(20deg) brightness(1.05)}
-.cv-morado   {filter:sepia(1) saturate(4) hue-rotate(240deg) brightness(.8)}
-.cv-naranja  {filter:sepia(1) saturate(5) hue-rotate(340deg) brightness(.95)}
-.cv-gris     {filter:grayscale(1) brightness(.85)}
-.cv-cafe     {filter:sepia(1) saturate(2) brightness(.75)}
-.color-dot-active{outline:2px solid var(--gold);outline-offset:2px}
-.color-preview-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:6px}
+/* ══ COLORES — bolitas sin filtros CSS ═══════════════════════ */
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,255,255,.18);}
+.color-swatch.act{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.4);}
+.color-swatch:hover{transform:scale(1.15);}
+.color-selected-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;}
+/* admin form chips */
+.sz-chip{padding:7px 14px;border-radius:999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;background:rgba(255,255,255,.04);border:.5px solid var(--border);color:var(--muted);transition:all .2s;font-family:var(--body);}
+.sz-chip.on{background:var(--gold);color:#000;border-color:var(--gold);}
+.sz-chip.sz-unica.on{background:var(--pink);color:#fff;border-color:var(--pink);}
+.color-row-input{display:flex;align-items:center;gap:8px;background:#000;border:.5px solid var(--border);border-radius:12px;padding:8px 12px;margin-bottom:6px;}
+.color-row-input input[type=text]{flex:1;background:transparent;border:none;outline:none;font-size:12px;color:#fff;font-family:var(--body);}
+.color-row-input input[type=color]{width:32px;height:32px;border:none;border-radius:50%;cursor:pointer;padding:2px;background:transparent;}
+.color-row-input button{background:rgba(231,76,60,.1);border:.5px solid rgba(231,76,60,.2);color:#e74c3c;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:13px;}
 
 /* ══ OPT-IN / OPT-OUT ═══════════════════════════════════════════════ */
 .toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
@@ -2353,8 +2347,25 @@ fbq('track','PageView');
               <div class="pf"><label>PRECIO OFERTA</label><input id="pf-s" type="number" placeholder=""/></div>
               <div class="pf"><label>STOCK *</label><input id="pf-st" type="number" placeholder="10"/></div>
               <div class="pf"><label>TAGS (coma)</label><input id="pf-t" placeholder="nuevo, oferta"/></div>
-              <div class="pf"><label>TALLAS (coma)</label><input id="pf-sz" placeholder="S, M, L, XL"/></div>
-              <div class="pf"><label>COLORES (coma)</label><input id="pf-cl" placeholder="Negro, Blanco"/></div>
+              <div class="pf">
+                <label>TALLAS DISPONIBLES</label>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="pf-sz-chips">
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'XS')">XS</button>
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'S')">S</button>
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'M')">M</button>
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'L')">L</button>
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'XL')">XL</button>
+                  <button type="button" class="sz-chip" onclick="toggleSzChip(this,'XXL')">XXL</button>
+                  <button type="button" class="sz-chip sz-unica" onclick="toggleUnica(this)">TALLA ÚNICA</button>
+                </div>
+                <input type="hidden" id="pf-sz"/>
+              </div>
+              <div class="pf">
+                <label>COLORES DEL PRODUCTO</label>
+                <div id="pf-colors-list" style="margin-top:6px"></div>
+                <button type="button" onclick="addColorRow()" style="margin-top:6px;padding:7px 16px;border-radius:999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;cursor:pointer;background:rgba(212,175,55,.08);border:.5px dashed rgba(212,175,55,.3);color:var(--gold)">+ AGREGAR COLOR</button>
+                <input type="hidden" id="pf-cl"/>
+              </div>
             </div>
             <div class="pf" style="margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
@@ -3167,16 +3178,34 @@ function openProd(id){
   document.getElementById('d-thumbs').innerHTML=p.images.map(function(img,i){
     return'<div class="thumb'+(i===0?' act':'')+'" onclick="setImg(\''+img+'\',this)"><img src="'+img+'" alt=""/></div>';
   }).join('');
-  var szList=p.sizes.length?p.sizes:['TALLA ÚNICA'];
+  var szList=(p.sizes&&p.sizes.length)?p.sizes:['TALLA ÚNICA'];
+  var isUnica=szList.length===1&&szList[0]==='TALLA ÚNICA';
   DB.selSz=szList[0];
-  document.getElementById('sz-lbl').style.display='block';
-  document.getElementById('d-sizes').innerHTML=szList.map(function(s){
-    return'<button class="sz'+(s===DB.selSz?' act':'')+'" onclick="selSz(\''+s+'\',this)">'+s+'</button>';
-  }).join('');
-  document.getElementById('col-lbl').style.display=p.colors.length?'block':'none';
-  document.getElementById('d-colors').innerHTML=p.colors.map(function(c){
-    return'<button class="col'+(c===DB.selCol?' act':'')+'" onclick="selCol(\''+c+'\',this)">'+c+'</button>';
-  }).join('');
+  var szLbl=document.getElementById('sz-lbl');
+  var szRow=document.getElementById('d-sizes');
+  if(isUnica){
+    if(szLbl) szLbl.style.display='none';
+    szRow.innerHTML='<div style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:rgba(212,175,55,.1);border:.5px solid rgba(212,175,55,.3);border-radius:999px;font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.12em">&#10003; TALLA ÚNICA</div>';
+  } else {
+    if(szLbl) szLbl.style.display='block';
+    // Render size buttons using data attributes to avoid quote escaping issues
+    szRow.innerHTML=szList.map(function(s){
+      return'<button class="sz'+(s===DB.selSz?' act':'')+'" data-sz="'+s+'" onclick="selSzBtn(this)">'+s+'</button>';
+    }).join('');
+  }
+  var parsedCols=parseColors(Array.isArray(p.colors)?p.colors.join(','):(p.colors||''));
+  DB.selCol=parsedCols.length?parsedCols[0].name:'';
+  DB.selColHex=parsedCols.length?parsedCols[0].hex:'';
+  var colLbl=document.getElementById('col-lbl');
+  var colRow=document.getElementById('d-colors');
+  if(parsedCols.length){
+    if(colLbl) colLbl.style.display='block';
+    colRow.innerHTML=renderColorSwatches(p.colors,DB.selCol)
+      +'<div style="margin-top:8px"><span class="color-selected-label" id="color-selected-label">Color: '+DB.selCol+'</span></div>';
+  } else {
+    if(colLbl) colLbl.style.display='none';
+    colRow.innerHTML='';
+  }
   document.getElementById('qty-n').textContent=DB.qty;
   document.getElementById('qty-stock').textContent='('+p.stock+' disponibles)';
   var btn=document.getElementById('add-btn');
@@ -3189,6 +3218,7 @@ function setImg(src,el){
   document.querySelectorAll('.thumb').forEach(function(t){t.classList.remove('act');});
   el.classList.add('act');
 }
+function selSzBtn(el){selSz(el.dataset.sz,el);}
 function selSz(s,el){
   DB.selSz=s;
   document.querySelectorAll('.sz').forEach(function(b){b.classList.remove('act');});
@@ -3203,17 +3233,20 @@ function chgQty(d){
 
 function quickAdd(id){
   var p=DB.products.find(function(x){return x.id===id;});
-  if(p) addCart(p,1,p.sizes.length?p.sizes[0]:'TALLA ÚNICA',p.colors.length?p.colors[0]:'');
+  if(!p) return;
+  var cols=parseColors(Array.isArray(p.colors)?p.colors.join(','):(p.colors||''));
+  var sz=(p.sizes&&p.sizes.length)?p.sizes[0]:'TALLA ÚNICA';
+  addCart(p,1,sz,cols.length?cols[0].name:'',cols.length?cols[0].hex:'');
 }
 
 // ══════════════════════════════════════════════════════
 // CART
 // ══════════════════════════════════════════════════════
-function addCart(p,qty,sz,col){
+function addCart(p,qty,sz,col,colHex){
   var key=p.id+'|'+sz+'|'+col;
   var ex=DB.cart.find(function(c){return c.key===key;});
   if(ex) ex.qty+=qty;
-  else DB.cart.push({key:key,p:p,qty:qty,sz:sz,col:col});
+  else DB.cart.push({key:key,p:p,qty:qty,sz:sz,col:col,colHex:colHex||''});
   updBadge();
 }
 function updBadge(){document.getElementById('cart-badge').textContent=DB.cart.reduce(function(s,c){return s+c.qty;},0);}
@@ -3232,7 +3265,8 @@ function renderCart(){
     h+='<div class="ci"><div class="ci-img"><img src="'+c.p.images[0]+'" alt="'+c.p.name+'"/></div>';
     h+='<div style="flex:1"><div class="ci-cat">'+c.p.cat.toUpperCase()+'</div>';
     h+='<div class="ci-name">'+c.p.name+'</div>';
-    h+='<div class="ci-meta">'+(c.sz?'TALLA: '+c.sz:'')+(c.col?' · COLOR: '+c.col:'')+'</div>';
+    var cDot=c.colHex?'<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+c.colHex+';border:1px solid rgba(255,255,255,.2);margin-right:3px;vertical-align:middle"></span>':'';
+    h+='<div class="ci-meta">'+(c.sz?'TALLA: '+c.sz:'')+(c.col?' · '+cDot+'COLOR: '+c.col:'')+'</div>';
     h+='<div class="ci-qty-row"><button class="ci-qb" onclick="chgCartQty(\''+c.key+'\',-1)">−</button><span class="ci-qn">'+c.qty+'</span><button class="ci-qb" onclick="chgCartQty(\''+c.key+'\',1)">+</button></div></div>';
     h+='<div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between">';
     h+='<div class="ci-price">$'+price.toLocaleString('es-CO')+'</div>';
@@ -3308,7 +3342,7 @@ function placeOrder(){
   var num='RM-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
   DB.orders.push({id:DB.orders.length+1,num:num,name:name,phone:phone,addr:addr,city:city,dept:document.getElementById('co-dept').value,pay:DB.payMethod,items:DB.cart.map(function(c){return{n:c.p.name,q:c.qty,p:(c.p.sale||c.p.price),sz:c.sz,col:c.col};}),sub:sub,ship:DB.ship,total:sub+DB.ship,status:'nuevo',date:new Date().toISOString()});
   document.getElementById('suc-num').textContent=num;
-  var msg='Hola REYNA MODA! Confirmo mi pedido:\n\nPedido: '+num+'\nNombre: '+name+'\nTeléfono: '+phone+'\nDirección: '+addr+', '+city+'\n\nProductos:\n'+DB.cart.map(function(c){return'- '+c.p.name+' x'+c.qty+(c.sz?' ('+c.sz+')':'')+' — $'+((c.p.sale||c.p.price)*c.qty).toLocaleString('es-CO');}).join('\n')+'\n\nSubtotal: $'+sub.toLocaleString('es-CO')+'\nEnvío: $'+DB.ship.toLocaleString('es-CO')+'\nTOTAL: $'+(sub+DB.ship).toLocaleString('es-CO')+'\nMétodo de pago: '+DB.payMethod;
+  var msg='Hola REYNA MODA! Confirmo mi pedido:\n\nPedido: '+num+'\nNombre: '+name+'\nTeléfono: '+phone+'\nDirección: '+addr+', '+city+'\n\nProductos:\n'+DB.cart.map(function(c){return'- '+c.p.name+' x'+c.qty+(c.sz?' | Talla: '+c.sz:'')+(c.col?' | Color: '+c.col:'')+' — $'+((c.p.sale||c.p.price)*c.qty).toLocaleString('es-CO');}).join('\n')+'\n\nSubtotal: $'+sub.toLocaleString('es-CO')+'\nEnvío: $'+DB.ship.toLocaleString('es-CO')+'\nTOTAL: $'+(sub+DB.ship).toLocaleString('es-CO')+'\nMétodo de pago: '+DB.payMethod;
   setTimeout(function(){
     openWA(msg);
     DB.cart=[];updBadge();
@@ -3358,14 +3392,20 @@ function renderDash(){
 // PRODUCTS
 function togglePF(){var w=document.getElementById('pf-wrap');var v=w.style.display!=='none';w.style.display=v?'none':'block';if(!v){DB.editId=null;clearPF();document.getElementById('pf-title').textContent='NUEVO PRODUCTO';}}
 function cancelPF(){document.getElementById('pf-wrap').style.display='none';DB.editId=null;clearPF();}
-function clearPF(){['pf-n','pf-p','pf-s','pf-st','pf-t','pf-sz','pf-cl','pf-d','pf-i'].forEach(function(i){document.getElementById(i).value='';});document.getElementById('pf-c').value='Mujer';}
+function clearPF(){
+  ['pf-n','pf-p','pf-s','pf-st','pf-t','pf-sz','pf-cl','pf-d','pf-i'].forEach(function(i){var el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('pf-c').value='Mujer';
+  clearSzChips();
+  var list=document.getElementById('pf-colors-list');if(list)list.innerHTML='';
+}
 function editProd(id){
   var p=DB.products.find(function(x){return x.id===id;});if(!p) return;
   DB.editId=id;
   document.getElementById('pf-n').value=p.name;document.getElementById('pf-c').value=p.cat;
   document.getElementById('pf-p').value=p.price;document.getElementById('pf-s').value=p.sale||'';
   document.getElementById('pf-st').value=p.stock;document.getElementById('pf-t').value=p.tags.join(', ');
-  document.getElementById('pf-sz').value=p.sizes.join(', ');document.getElementById('pf-cl').value=p.colors.join(', ');
+  loadSzChips(p.sizes||[]);
+  loadColorRows(Array.isArray(p.colors)?p.colors.join(','):(p.colors||''));
   document.getElementById('pf-d').value=p.desc;document.getElementById('pf-i').value=p.images.join(', ');
   document.getElementById('pf-title').textContent='EDITAR PRODUCTO';
   document.getElementById('pf-wrap').style.display='block';
@@ -3377,13 +3417,14 @@ function saveProduct(){
   var d=document.getElementById('pf-d').value.trim();
   var imgs=document.getElementById('pf-i').value.split(',').map(function(s){return s.trim();}).filter(Boolean);
   if(!n||!pr||!d||!imgs.length){alert('COMPLETA: Nombre, Precio, Descripción e Imágenes.');return;}
+  syncColorField();
   var p={
     id:DB.editId||Date.now(),name:n,cat:document.getElementById('pf-c').value,price:pr,
     sale:parseFloat(document.getElementById('pf-s').value)||null,
     stock:parseInt(document.getElementById('pf-st').value)||0,
     tags:document.getElementById('pf-t').value.split(',').map(function(s){return s.trim().toUpperCase();}).filter(Boolean),
     sizes:document.getElementById('pf-sz').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
-    colors:document.getElementById('pf-cl').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
+    colors:document.getElementById('pf-cl').value||'',
     desc:d,images:imgs,
   };
   if(DB.editId){var idx=DB.products.findIndex(function(x){return x.id===DB.editId;});if(idx>=0) DB.products[idx]=p;}
@@ -3956,7 +3997,7 @@ placeOrder=function(){
   var pts=Math.floor(total/1000);
   DB.orders.push({id:DB.orders.length+1,num:num,name:name,phone:phone,addr:addr,city:city,dept:document.getElementById('co-dept').value,pay:DB.payMethod,items:DB.cart.map(function(c){return{n:c.p.name,q:c.qty,p:(c.p.sale||c.p.price),sz:c.sz,col:c.col};}),sub:subFinal,ship:DB.ship,total:total,status:'nuevo',date:new Date().toISOString()});
   document.getElementById('suc-num').textContent=num;
-  var msg='Hola REYNA MODA! Confirmo mi pedido:\n\nPedido: '+num+'\nNombre: '+name+'\nTeléfono: '+phone+'\nDirección: '+addr+', '+city+'\n\nProductos:\n'+DB.cart.map(function(c){return'- '+c.p.name+' x'+c.qty+(c.sz?' ('+c.sz+')':'')+' — $'+((c.p.sale||c.p.price)*c.qty).toLocaleString('es-CO');}).join('\n')+'\n\nSubtotal: $'+subFinal.toLocaleString('es-CO')+(disc>'0'?'\nDescuento '+DB.activeCoupon.code+': -$'+disc.toLocaleString('es-CO'):'')+'\nEnvío: $'+DB.ship.toLocaleString('es-CO')+'\nTOTAL: $'+total.toLocaleString('es-CO')+'\nMétodo de pago: '+DB.payMethod;
+  var msg='Hola REYNA MODA! Confirmo mi pedido:\n\nPedido: '+num+'\nNombre: '+name+'\nTeléfono: '+phone+'\nDirección: '+addr+', '+city+'\n\nProductos:\n'+DB.cart.map(function(c){return'- '+c.p.name+' x'+c.qty+(c.sz?' | Talla: '+c.sz:'')+(c.col?' | Color: '+c.col:'')+' — $'+((c.p.sale||c.p.price)*c.qty).toLocaleString('es-CO');}).join('\n')+'\n\nSubtotal: $'+subFinal.toLocaleString('es-CO')+(disc>'0'?'\nDescuento '+DB.activeCoupon.code+': -$'+disc.toLocaleString('es-CO'):'')+'\nEnvío: $'+DB.ship.toLocaleString('es-CO')+'\nTOTAL: $'+total.toLocaleString('es-CO')+'\nMétodo de pago: '+DB.payMethod;
   setTimeout(function(){
     openWA(msg);
     addPoints(pts);
@@ -4574,6 +4615,7 @@ renderGrid=function(list,containerId){
     h+='<span class="pcard-price">$'+dp.toLocaleString('es-CO')+'</span>';
     if(p.sale) h+='<span class="pcard-price-old">$'+p.price.toLocaleString('es-CO')+'</span>';
     h+='</div>';
+    h+=renderCardColorDots(p);
     if(p.stock>0&&p.stock<=3) h+='<div class="pcard-stock" style="color:#e74c3c">¡SOLO QUEDAN '+p.stock+'!</div>';
     else if(p.stock>0&&p.stock<=7) h+='<div class="pcard-stock">¡Solo '+p.stock+' disponibles!</div>';
     else if(p.stock===0) h+='<div class="pcard-stock" style="color:#e74c3c">AGOTADO</div>';
@@ -4814,7 +4856,7 @@ function addFromDetail(){
   var rowEl=document.getElementById('d-sizes');
   if(msgEl) msgEl.classList.remove('show');
   if(rowEl) rowEl.classList.remove('error');
-  addCart(p,DB.qty,DB.selSz,DB.selCol);
+  addCart(p,DB.qty,DB.selSz,DB.selCol,DB.selColHex||'');
   go('cart');
 }
 
@@ -4925,94 +4967,7 @@ document.addEventListener('click',function(e){
   if(!e.target.closest('.search-wrap')) hideSearchDropdown();
 });
 
-// ══════════════════════════════════════════════════════
-// CAMBIO DE COLOR DE PRENDA CON FILTROS CSS
-// ══════════════════════════════════════════════════════
-var COLOR_FILTERS={
-  'negro':    'cv-negro',
-  'black':    'cv-negro',
-  'blanco':   'cv-blanco',
-  'white':    'cv-blanco',
-  'crema':    'cv-amarillo',
-  'beige':    'cv-cafe',
-  'rojo':     'cv-rojo',
-  'red':      'cv-rojo',
-  'coral':    'cv-rojo',
-  'azul':     'cv-azul',
-  'blue':     'cv-azul',
-  'azul oscuro':'cv-azul',
-  'navy':     'cv-azul',
-  'verde':    'cv-verde',
-  'green':    'cv-verde',
-  'amarillo': 'cv-amarillo',
-  'yellow':   'cv-amarillo',
-  'rosa':     'cv-rosa',
-  'pink':     'cv-rosa',
-  'fucsia':   'cv-fucsia',
-  'magenta':  'cv-fucsia',
-  'dorado':   'cv-dorado',
-  'gold':     'cv-dorado',
-  'morado':   'cv-morado',
-  'violeta':  'cv-morado',
-  'purple':   'cv-morado',
-  'lila':     'cv-morado',
-  'naranja':  'cv-naranja',
-  'orange':   'cv-naranja',
-  'gris':     'cv-gris',
-  'gray':     'cv-gris',
-  'grey':     'cv-gris',
-  'plata':    'cv-gris',
-  'plateado': 'cv-gris',
-  'cafe':     'cv-cafe',
-  'brown':    'cv-cafe',
-  'chocolate':'cv-cafe',
-  'tinto':    'cv-cafe',
-  'vino':     'cv-cafe',
-};
-
-function getColorFilter(colorName){
-  if(!colorName) return 'cv-negro';
-  var key=colorName.toLowerCase().trim();
-  return COLOR_FILTERS[key]||'cv-negro';
-}
-
-function applyColorToImage(colorName){
-  var img=document.getElementById('d-main-img');
-  var label=document.getElementById('color-preview-label');
-  if(!img) return;
-  // Remove all cv- classes
-  var classes=img.className.split(' ').filter(function(cl){return !cl.startsWith('cv-');});
-  var filterClass=getColorFilter(colorName);
-  classes.push(filterClass);
-  img.className=classes.join(' ');
-  if(label){
-    if(filterClass==='cv-negro'){label.textContent='';}
-    else{label.textContent='🎨 VISTA PREVIA: '+colorName.toUpperCase()+' (simulación de color)';}
-  }
-}
-
-// Override selColor para aplicar filtro
-var _selColBase=selCol;
-selCol=function(colorName,el){
-  _selColBase(colorName,el);
-  applyColorToImage(colorName);
-};
-
-// Override openProd para resetear color al abrir
-var _openProdColorBase=openProd;
-openProd=function(id){
-  _openProdColorBase(id);
-  setTimeout(function(){
-    // Reset color filter to default (first color or negro)
-    var p=DB.products.find(function(x){return x.id===id;});
-    if(p&&p.colors&&p.colors.length>0){
-      applyColorToImage(p.colors[0]);
-      DB.selCol=p.colors[0];
-    } else {
-      applyColorToImage('negro');
-    }
-  },80);
-};
+// [color CSS filters removed]
 
 
 // ══════════════════════════════════════════════════════
@@ -5429,6 +5384,125 @@ window.onload=function(){
   if(_onloadV9) _onloadV9();
   updateWishCount();
 };
+
+// ══════════════════════════════════════════════════════════════════
+// COLORES Y TALLAS — VERSIÓN PROFESIONAL (sin filtros CSS)
+// Formato de colores guardado: "Nombre|#hexcode,Nombre2|#hex2"
+// ══════════════════════════════════════════════════════════════════
+var COLOR_HEX_SUGGESTIONS={'negro':'#1a1a1a','blanco':'#f5f5f0','rojo':'#c0392b','azul':'#2471a3','azul oscuro':'#1a3a5c','verde':'#1e8449','amarillo':'#d4ac0d','rosa':'#e91e8c','fucsia':'#ff007f','dorado':'#d4af37','morado':'#7d3c98','lila':'#9b59b6','naranja':'#e67e22','gris':'#808080','gris claro':'#bdc3c7','cafe':'#6e2c00','beige':'#d2b48c','crema':'#fffdd0','plateado':'#aab7b8','tinto':'#4a0e0e','vino':'#800020'};
+function suggestHex(n){return COLOR_HEX_SUGGESTIONS[n.toLowerCase().trim()]||'#888888';}
+
+// Parsear "Azul|#2471a3,Negro|#1a1a1a" → [{name,hex},...]
+function parseColors(raw){
+  if(!raw) return [];
+  if(Array.isArray(raw)) raw=raw.join(',');
+  return raw.split(',').map(function(part){
+    part=part.trim(); if(!part) return null;
+    var pipe=part.lastIndexOf('|');
+    if(pipe<0) return {name:part,hex:suggestHex(part)};
+    return {name:part.slice(0,pipe).trim(),hex:part.slice(pipe+1).trim()||suggestHex(part.slice(0,pipe))};
+  }).filter(Boolean);
+}
+
+// ── Admin: agregar fila de color ──────────────────────────────────
+function addColorRow(name,hex){
+  var list=document.getElementById('pf-colors-list');
+  if(!list) return;
+  var colorName=name||''; var colorHex=hex||'#888888';
+  var row=document.createElement('div');
+  row.className='color-row-input';
+  row.innerHTML='<input type="color" value="'+colorHex+'"/>'
+    +'<input type="text" placeholder="Nombre del color (ej: Azul marino)" value="'+colorName+'" oninput="var h=suggestHex(this.value);if(h!==\'#888888\')this.previousElementSibling.value=h;"/>'
+    +'<button type="button" onclick="this.closest(\'.color-row-input\').remove()">✕</button>';
+  list.appendChild(row);
+}
+
+// Leer todas las filas y guardar en campo hidden
+function syncColorField(){
+  var rows=document.querySelectorAll('#pf-colors-list .color-row-input');
+  var colors=[];
+  rows.forEach(function(row){
+    var hexEl=row.querySelector('input[type=color]');
+    var nameEl=row.querySelector('input[type=text]');
+    var name=nameEl?nameEl.value.trim():''; var hex=hexEl?hexEl.value:'#888888';
+    if(name) colors.push(name+'|'+hex);
+  });
+  var f=document.getElementById('pf-cl'); if(f) f.value=colors.join(',');
+}
+
+// Cargar colores en las filas al editar
+function loadColorRows(raw){
+  var list=document.getElementById('pf-colors-list'); if(!list) return;
+  list.innerHTML='';
+  var colors=parseColors(raw);
+  if(!colors.length){addColorRow('','#888888');return;}
+  colors.forEach(function(c){addColorRow(c.name,c.hex);});
+}
+
+// ── Admin: chips de talla ─────────────────────────────────────────
+var _selectedSizes=[];
+function toggleSzChip(el,size){
+  if(size==='TALLA ÚNICA'){
+    document.querySelectorAll('#pf-sz-chips .sz-chip').forEach(function(b){b.classList.remove('on');});
+    _selectedSizes=[];
+  } else {
+    var unica=document.querySelector('.sz-chip.sz-unica');
+    if(unica) unica.classList.remove('on');
+    _selectedSizes=_selectedSizes.filter(function(s){return s!=='TALLA ÚNICA';});
+  }
+  var idx=_selectedSizes.indexOf(size);
+  if(idx>=0){_selectedSizes.splice(idx,1);el.classList.remove('on');}
+  else{_selectedSizes.push(size);el.classList.add('on');}
+  var f=document.getElementById('pf-sz'); if(f) f.value=_selectedSizes.join(', ');
+}
+function toggleUnica(el){toggleSzChip(el,'TALLA ÚNICA');}
+function clearSzChips(){
+  _selectedSizes=[];
+  document.querySelectorAll('#pf-sz-chips .sz-chip').forEach(function(b){b.classList.remove('on');});
+  var f=document.getElementById('pf-sz'); if(f) f.value='';
+}
+function loadSzChips(arr){
+  clearSzChips();
+  if(!arr||!arr.length) return;
+  arr.forEach(function(s){
+    s=s.trim();
+    var btn=document.querySelector('#pf-sz-chips .sz-chip[onclick*="\''+s+'\'"]');
+    if(btn){btn.classList.add('on');_selectedSizes.push(s);}
+  });
+  var f=document.getElementById('pf-sz'); if(f) f.value=_selectedSizes.join(', ');
+}
+
+// ── Cliente: render bolitas de color ─────────────────────────────
+function renderColorSwatches(colorsRaw,selectedName){
+  var colors=parseColors(colorsRaw);
+  if(!colors.length) return '';
+  return colors.map(function(col){
+    var act=col.name===selectedName?' act':'';
+    return '<button class="color-swatch'+act+'" style="background:'+col.hex
+      +'" title="'+col.name+'" onclick="selCol(\''+col.name.replace(/'/g,"\\'")
+      +'\',\''+col.hex+'\',this)"></button>';
+  }).join('');
+}
+function renderCardColorDots(p){
+  var colors=parseColors(Array.isArray(p.colors)?p.colors.join(','):(p.colors||''));
+  if(!colors.length) return '';
+  var dots=colors.slice(0,5).map(function(c){
+    return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'
+      +c.hex+';border:1px solid rgba(255,255,255,.2);margin-right:2px" title="'+c.name+'"></span>';
+  }).join('');
+  if(colors.length>5) dots+='<span style="font-size:9px;color:var(--muted)">+' +(colors.length-5)+'</span>';
+  return '<div style="display:flex;align-items:center;flex-wrap:wrap;margin-top:6px">'+dots+'</div>';
+}
+
+// selCol actualizado: sin filtros CSS
+function selCol(colorName,hex,el){
+  DB.selCol=colorName; DB.selColHex=hex||'';
+  document.querySelectorAll('.color-swatch').forEach(function(b){b.classList.remove('act');});
+  if(el) el.classList.add('act');
+  var lbl=document.getElementById('color-selected-label');
+  if(lbl) lbl.textContent='Color: '+colorName;
+}
+
 window.onload=function(){
   // Cargar datos guardados ANTES de renderizar
   var loaded = loadFromStorage();
