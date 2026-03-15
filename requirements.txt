@@ -1,5 +1,5 @@
 fastapi==0.95.2
-unicorn[standard]==0.25.0
+uvicorn[standard]==0.25.0
 motor==3.4.0
 pymongo==4.7.2
 pydantic==1.10.13
