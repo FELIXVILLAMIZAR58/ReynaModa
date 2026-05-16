@@ -1635,7 +1635,7 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','REEMPLAZAR_CON_TU_PIXEL_ID');
+fbq('init', localStorage.getItem('reyna_pixel_id') || '');
 fbq('track','PageView');
 </script>
 </head>
@@ -3340,7 +3340,33 @@ function placeOrder(){
   btn.disabled=true;btn.textContent='PROCESANDO...';
   var sub=DB.cart.reduce(function(s,c){return s+(c.p.sale||c.p.price)*c.qty;},0);
   var num='RM-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.random().toString(36).substr(2,6).toUpperCase();
-  DB.orders.push({id:DB.orders.length+1,num:num,name:name,phone:phone,addr:addr,city:city,dept:document.getElementById('co-dept').value,pay:DB.payMethod,items:DB.cart.map(function(c){return{n:c.p.name,q:c.qty,p:(c.p.sale||c.p.price),sz:c.sz,col:c.col};}),sub:sub,ship:DB.ship,total:sub+DB.ship,status:'nuevo',date:new Date().toISOString()});
+  var orderData={
+    num:num,name:name,phone:phone,
+    email:document.getElementById('co-email')?document.getElementById('co-email').value.trim():'',
+    addr:addr,city:city,
+    dept:document.getElementById('co-dept').value,
+    pay:DB.payMethod,
+    items:DB.cart.map(function(c){return{n:c.p.name,q:c.qty,p:(c.p.sale||c.p.price),sz:c.sz,col:c.col};}),
+    sub:sub,ship:DB.ship,total:sub+DB.ship,status:'nuevo'
+  };
+  // Guardar en MongoDB si hay API disponible
+  var savePromise=Promise.resolve();
+  if(API_URL){
+    savePromise=fetch(API_URL+'/pedidos',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(orderData)
+    }).catch(function(){/* sin conexión, continúa igual */});
+    // También registrar el cliente
+    fetch(API_URL+'/clientes',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:name,phone:phone,
+        email:orderData.email,city:city,marketing_ok:true})
+    }).catch(function(){});
+  }
+  // Guardar local igual que antes
+  DB.orders.push(Object.assign({id:DB.orders.length+1,date:new Date().toISOString()},orderData));
   document.getElementById('suc-num').textContent=num;
   var msg='Hola REYNA MODA! Confirmo mi pedido:\n\nPedido: '+num+'\nNombre: '+name+'\nTeléfono: '+phone+'\nDirección: '+addr+', '+city+'\n\nProductos:\n'+DB.cart.map(function(c){return'- '+c.p.name+' x'+c.qty+(c.sz?' | Talla: '+c.sz:'')+(c.col?' | Color: '+c.col:'')+' — $'+((c.p.sale||c.p.price)*c.qty).toLocaleString('es-CO');}).join('\n')+'\n\nSubtotal: $'+sub.toLocaleString('es-CO')+'\nEnvío: $'+DB.ship.toLocaleString('es-CO')+'\nTOTAL: $'+(sub+DB.ship).toLocaleString('es-CO')+'\nMétodo de pago: '+DB.payMethod;
   setTimeout(function(){
@@ -4653,16 +4679,38 @@ function pmTab(el,id){
 function loginUser(){
   var email=document.getElementById('pm-login-email').value.trim().toLowerCase();
   var phone=document.getElementById('pm-login-phone').value.trim();
-  var user=DB.customers.find(function(c){return c.email===email||c.phone===phone;});
-  if(user){
-    DB_currentUser=user;
-    updateNavUser();
-    addAdminNotif('👤 INGRESO',user.name+' inició sesión.');
-    closeProfile();
-    alert('¡Bienvenida de vuelta, '+user.name+'! 👑');
+  if(!email&&!phone){alert('Ingresa tu email o teléfono.');return;}
+  // Intenta buscar en el backend primero
+  if(API_URL){
+    var q=phone?('?phone='+encodeURIComponent(phone)):('?email='+encodeURIComponent(email));
+    fetch(API_URL+'/clientes'+q)
+      .then(function(r){return r.ok?r.json():null;})
+      .then(function(lista){
+        var user=lista&&lista.length?lista[0]:null;
+        if(user){
+          // Sincroniza al array local también
+          var local=DB.customers.find(function(c){return c.phone===user.phone||c.email===user.email;});
+          if(!local){DB.customers.push(user);}
+          DB_currentUser=user;
+          updateNavUser();
+          addAdminNotif('👤 INGRESO',user.name+' inició sesión.');
+          closeProfile();
+          alert('¡Bienvenida de vuelta, '+user.name+'! 👑');
+        } else {
+          alert('No encontramos una cuenta con esos datos. Por favor regístrate.');
+          pmTab(document.querySelectorAll('.pm-tab')[1],'register');
+        }
+      })
+      .catch(function(){
+        // Fallback local si falla la red
+        var user=DB.customers.find(function(c){return c.email===email||c.phone===phone;});
+        if(user){DB_currentUser=user;updateNavUser();closeProfile();alert('¡Bienvenida de vuelta, '+user.name+'! 👑');}
+        else{alert('No encontramos una cuenta con esos datos. Por favor regístrate.');pmTab(document.querySelectorAll('.pm-tab')[1],'register');}
+      });
   } else {
-    alert('No encontramos una cuenta con esos datos. Por favor regístrate.');
-    pmTab(document.querySelectorAll('.pm-tab')[1],'register');
+    var user=DB.customers.find(function(c){return c.email===email||c.phone===phone;});
+    if(user){DB_currentUser=user;updateNavUser();addAdminNotif('👤 INGRESO',user.name+' inició sesión.');closeProfile();alert('¡Bienvenida de vuelta, '+user.name+'! 👑');}
+    else{alert('No encontramos una cuenta con esos datos. Por favor regístrate.');pmTab(document.querySelectorAll('.pm-tab')[1],'register');}
   }
 }
 function registerUser(){
@@ -4674,6 +4722,16 @@ function registerUser(){
   var existing=DB.customers.find(function(c){return c.email===email||c.phone===phone;});
   if(existing){DB_currentUser=existing;updateNavUser();closeProfile();alert('Ya tienes cuenta, ¡bienvenida '+existing.name+'! 👑');return;}
   var newUser={id:DB.customers.length+1,name:name,email:email,phone:phone,city:city,orders:0,totalSpent:0,points:0,level:'BRONZE',registeredAt:new Date().toISOString(),lastOrder:null};
+  // Guardar en MongoDB si hay API disponible
+  if(API_URL){
+    fetch(API_URL+'/clientes',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:name,email:email,phone:phone,city:city,marketing_ok:true})
+    }).then(function(r){return r.ok?r.json():null;})
+    .then(function(saved){if(saved&&saved._id)newUser._id=saved._id;})
+    .catch(function(){/* sin conexión, queda solo local */});
+  }
   DB.customers.push(newUser);
   DB_currentUser=newUser;
   updateNavUser();renderCustomers();updateCustomerStats();
