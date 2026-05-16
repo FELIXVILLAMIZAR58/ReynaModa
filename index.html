@@ -2926,23 +2926,28 @@ function previewProductImage(input) {
 
 // ══ OVERRIDES — sincronizan local + MongoDB ════════════════════════
 
-// Login: intenta API primero, luego local
+// Login: intenta API primero, luego local siempre
 var _doLoginLocal = doLogin;
 doLogin = async function() {
   var u = document.getElementById('l-user').value.trim();
   var p = document.getElementById('l-pass').value;
   if (API_URL) {
-    var ok = await doLoginAPI(u, p);
-    if (ok) {
-      document.getElementById('l-err').classList.remove('show');
-      document.getElementById('a-username').textContent = u;
-      updateAPIIndicator();
-      renderPmGrid(); renderDash();
-      go('admin');
-      return;
-    }
+    try {
+      var ok = await Promise.race([
+        doLoginAPI(u, p),
+        new Promise(function(res){setTimeout(function(){res(false);},3000);})
+      ]);
+      if (ok) {
+        document.getElementById('l-err').classList.remove('show');
+        document.getElementById('a-username').textContent = u;
+        updateAPIIndicator();
+        renderPmGrid(); renderDash();
+        go('admin');
+        return;
+      }
+    } catch(e) { /* si falla la API, cae al login local */ }
   }
-  _doLoginLocal(); // fallback a login local
+  _doLoginLocal(); // fallback a credenciales locales siempre
 };
 
 // Guardar producto
